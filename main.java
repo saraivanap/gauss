@@ -1,32 +1,36 @@
 import java.util.Scanner;
 
 public class GaussElimination {
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        // Receber o número de variáveis
-        System.out.println("Digite o número de variáveis: ");
+        // Solicita o número de variáveis
+        System.out.print("Digite o número de variáveis: ");
         int n = scanner.nextInt();
 
-        // Criar a matriz aumentada
+        // Matriz aumentada para armazenar os coeficientes e termos independentes
         double[][] matriz = new double[n][n + 1];
 
-        // Receber a matriz aumentada (coeficientes e termos independentes)
-        System.out.println("Digite os coeficientes e os termos independentes (linha por linha): ");
+        // Entrada da matriz aumentada
+        System.out.println("Digite os coeficientes e os termos independentes:");
         for (int i = 0; i < n; i++) {
             for (int j = 0; j <= n; j++) {
                 matriz[i][j] = scanner.nextDouble();
             }
         }
 
-        // Aplicar o método de eliminação de Gauss
-        gaussElimination(matriz, n);
+        // Aplica o método de eliminação de Gauss
+        if (!gaussElimination(matriz, n)) {
+            System.out.println("O sistema não possui uma solução única.");
+            return; // Encerra o programa se não for possível resolver
+        }
 
-        // Resolver o sistema por substituição retroativa
+        // Realiza a substituição retroativa para encontrar a solução
         double[] solucao = retroSubstitution(matriz, n);
 
-        // Exibir a solução
-        System.out.println("Soluções: ");
+        // Exibe a solução
+        System.out.println("Soluções:");
         for (int i = 0; i < n; i++) {
             System.out.printf("x%d = %.4f%n", (i + 1), solucao[i]);
         }
@@ -35,30 +39,30 @@ public class GaussElimination {
     }
 
     // Função para aplicar a eliminação de Gauss
-    public static void gaussElimination(double[][] matriz, int n) {
+    public static boolean gaussElimination(double[][] matriz, int n) {
         for (int i = 0; i < n; i++) {
-            // Verifica se o pivô é zero, se for troca a linha
-            if (matriz[i][i] == 0) {
+            // Verifica se o pivô é zero; em caso positivo, tenta trocar de linha
+            if (Math.abs(matriz[i][i]) < 1e-10) {
                 boolean isSwapped = false;
                 for (int k = i + 1; k < n; k++) {
-                    if (matriz[k][i] != 0) {
+                    if (Math.abs(matriz[k][i]) > 1e-10) {
                         swapRows(matriz, i, k);
                         isSwapped = true;
                         break;
                     }
                 }
                 if (!isSwapped) {
-                    throw new ArithmeticException("Sistema sem solução ou com infinitas soluções.");
+                    return false; // Sistema não possui solução única
                 }
             }
 
-            // Normalizar a linha do pivô
+            // Normaliza a linha atual dividindo pelo pivô
             double pivot = matriz[i][i];
             for (int j = 0; j <= n; j++) {
                 matriz[i][j] /= pivot;
             }
 
-            // Eliminar as outras linhas
+            // Elimina os elementos abaixo e acima do pivô
             for (int k = 0; k < n; k++) {
                 if (k != i) {
                     double factor = matriz[k][i];
@@ -68,16 +72,17 @@ public class GaussElimination {
                 }
             }
         }
+        return true; // Retorna verdadeiro se o sistema puder ser resolvido
     }
 
-    // Função para trocar duas linhas da matriz
+    // Função para realizar a troca de linhas
     public static void swapRows(double[][] matriz, int row1, int row2) {
         double[] temp = matriz[row1];
         matriz[row1] = matriz[row2];
         matriz[row2] = temp;
     }
 
-    // Função para resolver o sistema usando substituição retroativa
+    // Função para realizar a substituição retroativa e encontrar as soluções
     public static double[] retroSubstitution(double[][] matriz, int n) {
         double[] solucao = new double[n];
         for (int i = n - 1; i >= 0; i--) {
