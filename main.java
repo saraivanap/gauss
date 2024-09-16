@@ -4,38 +4,48 @@ public class GaussElimination {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+        boolean continuar = true;
 
-        // Solicita o número de variáveis
-        System.out.print("Digite o número de variáveis: ");
-        int n = scanner.nextInt();
+        while (continuar) {
+            // Solicita o número de variáveis
+            System.out.print("Digite o número de variáveis: ");
+            int n = scanner.nextInt();
 
-        // Matriz aumentada para armazenar os coeficientes e termos independentes
-        double[][] matriz = new double[n][n + 1];
+            // Matriz aumentada para armazenar os coeficientes e termos independentes
+            double[][] matriz = new double[n][n + 1];
 
-        // Entrada da matriz aumentada
-        System.out.println("Digite os coeficientes e os termos independentes:");
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j <= n; j++) {
-                matriz[i][j] = scanner.nextDouble();
+            // Entrada da matriz aumentada
+            System.out.println("Digite os coeficientes e os termos independentes:");
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j <= n; j++) {
+                    matriz[i][j] = scanner.nextDouble();
+                }
+            }
+
+            // Aplica o método de eliminação de Gauss
+            if (!gaussElimination(matriz, n)) {
+                System.out.println("O sistema não possui uma solução única.");
+            } else {
+                // Realiza a substituição retroativa para encontrar a solução
+                double[] solucao = retroSubstitution(matriz, n);
+
+                // Exibe a solução
+                System.out.println("Soluções:");
+                for (int i = 0; i < n; i++) {
+                    System.out.printf("x%d = %.4f%n", (i + 1), solucao[i]);
+                }
+            }
+
+            // Pergunta ao usuário se deseja tentar outro sistema
+            System.out.print("Deseja tentar outro sistema? (s/n): ");
+            char resposta = scanner.next().charAt(0);
+            if (resposta == 'n' || resposta == 'N') {
+                continuar = false; // Encerra o loop se o usuário não quiser continuar
             }
         }
 
-        // Aplica o método de eliminação de Gauss
-        if (!gaussElimination(matriz, n)) {
-            System.out.println("O sistema não possui uma solução única.");
-            return; // Encerra o programa se não for possível resolver
-        }
-
-        // Realiza a substituição retroativa para encontrar a solução
-        double[] solucao = retroSubstitution(matriz, n);
-
-        // Exibe a solução
-        System.out.println("Soluções:");
-        for (int i = 0; i < n; i++) {
-            System.out.printf("x%d = %.4f%n", (i + 1), solucao[i]);
-        }
-
         scanner.close();
+        System.out.println("Programa encerrado.");
     }
 
     // Função para aplicar a eliminação de Gauss
